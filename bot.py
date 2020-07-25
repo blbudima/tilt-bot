@@ -43,14 +43,17 @@ async def on_message(message):
     args.pop(0)
     username = spaces.join(args)
 
+    # just for console
     print('The extracted username is: ' + username)
 
-    # send 
+    # send notice
     await message.channel.send('Let me check...')
 
+    # create summoner object
     print('Attempting to create summoner object (Region NA)..')
     summoner_name = Summoner(name=username, region="NA")
 
+    # attempt to look up match history
     print('Attempting to look up match history...')
     try:
       match_hist = summoner_name.match_history(begin_time=Patch.from_str("10.7", region="NA").start)
@@ -58,24 +61,29 @@ async def on_message(message):
       print(e)
       return await message.channel.send('That username does not exist!')
 
+    # check if you are looking for a win streak or a loss streak
     looking_for_win = False
     if (match_hist[0].participants[summoner_name].team.win is True):
       looking_for_win = True
 
+    # count match streak
     match_counter = 1
     while (True):
       next_turnout = match_hist[match_counter].participants[summoner_name].team.win
       if (looking_for_win and not next_turnout) or (not looking_for_win and next_turnout):
         break
       match_counter += 1
-    
+
+    # print results
+    print('Printing out result for ' + username)
     if looking_for_win:
       return await message.channel.send(username + ' is on a ' + str(match_counter) + ' game winning streak.')
     else:
       return await message.channel.send(username + ' is on a ' + str(match_counter) + ' game losing streak.')
 
   # if user supplied a non-existant command, show search
-  return await message.channel.send('The proper command is `' + config.prefix + 'search <username>`.')
+  if args[0] == config.prefix + 'help':
+    return await message.channel.send('The proper command is `' + config.prefix + 'search <username>`.')
 
 # login with the client
 client.run(config.token)
