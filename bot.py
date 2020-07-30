@@ -81,9 +81,13 @@ async def on_message(message):
     else:
       return await message.channel.send(username + ' is on a ' + str(match_counter) + ' game losing streak.')
 
-  # if user supplied a non-existant command, show search
+  # if user supplied help command, show search
   if args[0] == config.prefix + 'help':
     return await message.channel.send('The proper command is `' + config.prefix + 'search <username>`.')
+
+  # if user supplied invalid command, show search
+  if args[0][0:2] == config.prefix:
+    return await message.channel.send('Invalid usage! Do `' + config.prefix + 'search <username>`.')
 
 # login with the client
 client.run(config.token)
